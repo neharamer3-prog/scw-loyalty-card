@@ -10,12 +10,12 @@
         :root {
             --primary-gold: #e5a93b;
             --dark-gold: #b88219;
-            --bg-color: #f8f9fa;
+            --bg-color: #121212; /* خلفية ليلية فاخرة */
         }
 
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
+            background: radial-gradient(circle at center, #1e1e1e 0%, var(--bg-color) 100%);
             margin: 0;
             padding: 20px;
             display: flex;
@@ -23,111 +23,216 @@
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
+            overflow-x: hidden;
+            position: relative;
         }
 
-        .loyalty-card {
+        /* ✨ تأثير إضاءة أورورا ذهبية خافتة في الخلفية لجعل التصميم مذهلاً */
+        body::before {
+            content: '';
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(229, 169, 59, 0.08) 0%, transparent 70%);
+            top: 10%;
+            left: -50px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        body::after {
+            content: '';
+            position: absolute;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(229, 169, 59, 0.05) 0%, transparent 70%);
+            bottom: 15%;
+            right: -50px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* 🔄 حاوية البطاقة ثلاثية الأبعاد */
+        .card-container {
             width: 100%;
             max-width: 360px;
-            height: 210px;
-            background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
-            border-radius: 20px;
+            height: 215px;
+            perspective: 1200px;
+            margin-top: 30px;
+            cursor: pointer;
+            z-index: 1;
+        }
+
+        .card-inner {
+            width: 100%;
+            height: 100%;
             position: relative;
-            overflow: hidden;
+            transform-style: preserve-3d;
+            transition: transform 0.7s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .card-container.flipped .card-inner {
+            transform: rotateY(180deg);
+        }
+
+        .card-front, .card-back {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            backface-visibility: hidden;
+            border-radius: 24px;
             padding: 25px;
             box-sizing: border-box;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             color: white;
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(229, 169, 59, 0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 1px rgba(229, 169, 59, 0.3);
+            border: 1px solid rgba(229, 169, 59, 0.25);
+        }
+
+        /* 💳 واجهة الكرت الفاخرة */
+        .card-front {
+            background: linear-gradient(135deg, #2c2c2c 0%, #151515 100%);
+        }
+
+        /* 💳 ظهر الكرت */
+        .card-back {
+            background: linear-gradient(135deg, #151515 0%, #2c2c2c 100%);
+            transform: rotateY(180deg);
+            justify-content: center;
+            align-items: center;
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
+            width: 100%;
         }
 
         .logo-area {
-            font-size: 18px;
+            font-size: 19px;
             font-weight: 800;
             color: var(--primary-gold);
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
 
         .card-badge {
-            font-size: 11px;
+            font-size: 10px;
             background: linear-gradient(135deg, var(--primary-gold) 0%, var(--dark-gold) 100%);
-            padding: 5px 12px;
+            padding: 5px 14px;
             border-radius: 50px;
             font-weight: bold;
+            letter-spacing: 0.5px;
+            box-shadow: 0 4px 10px rgba(229, 169, 59, 0.2);
         }
 
         .points-display {
             margin: 15px 0;
+            width: 100%;
         }
 
         .points-label {
             font-size: 11px;
-            color: #adb5bd;
+            color: #999;
+            letter-spacing: 0.5px;
         }
 
         .points-count {
-            font-size: 42px;
+            font-size: 44px;
             font-weight: 800;
-            color: white;
+            background: linear-gradient(to right, #fff 30%, var(--primary-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
         }
 
         .member-name {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
-            color: #f8f9fa;
+            color: #f0f0f0;
+            width: 100%;
         }
 
-        /* 📌 قسم عرض كود الـ QR الخاص بالزبون */
-        .qr-container {
-            margin-top: 30px;
+        /* 📌 تصميم كود الـ QR بداخل ظهر الكرت */
+        .qr-inside-card {
             background: white;
-            padding: 15px;
-            border-radius: 15px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+            padding: 10px;
+            border-radius: 16px;
             display: flex;
             justify-content: center;
             align-items: center;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 2px solid var(--primary-gold);
+        }
+
+        /* 💡 إشعار تلميحي للمستخدم */
+        .hint-click {
+            font-size: 12px;
+            color: var(--primary-gold);
+            margin-top: 25px;
+            z-index: 1;
+            background: rgba(225, 169, 59, 0.1);
+            padding: 6px 16px;
+            border-radius: 50px;
+            border: 1px solid rgba(225, 169, 59, 0.2);
+            animation: pulse 2s infinite;
         }
 
         .info-text {
             font-size: 13px;
-            color: #6c757d;
+            color: #888;
             text-align: center;
-            margin-top: 15px;
-            line-height: 1.5;
-            padding: 0 20px;
+            margin-top: auto;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            padding: 0 25px;
+            z-index: 1;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.03); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
         }
     </style>
 </head>
 <body>
 
-    <div class="loyalty-card">
-        <div class="card-header">
-            <div class="logo-area">🍔 CAMPUS YUMMY 😋</div>
-            <div class="card-badge">VIP CARD</div>
-        </div>
-        <div class="points-display">
-            <div class="points-label">رصيد النقاط الحالي</div>
-            <div class="points-count" id="points-val">...</div>
-        </div>
-        <div class="card-footer">
-            <div class="member-name" id="user-fullname">جاري التحميل..</div>
+    <!-- الكرت الفاخر -->
+    <div class="card-container" id="loyaltyCard" onclick="toggleCardFlip()">
+        <div class="card-inner">
+            
+            <!-- الوجه الأمامي -->
+            <div class="card-front">
+                <div class="card-header">
+                    <div class="logo-area">🍔 CAMPUS YUMMY 😋</div>
+                    <div class="card-badge">VIP MEMBER</div>
+                </div>
+                <div class="points-display">
+                    <div class="points-label">رصيد النقاط الحالي</div>
+                    <div class="points-count" id="points-val">...</div>
+                </div>
+                <div class="card-footer">
+                    <div class="member-name" id="user-fullname">جاري التحميل..</div>
+                </div>
+            </div>
+
+            <!-- الظهر المحمي وفيه الـ QR -->
+            <div class="card-back">
+                <div class="qr-inside-card">
+                    <div id="qrcode"></div>
+                </div>
+            </div>
+
         </div>
     </div>
 
-    <div class="qr-container">
-        <div id="qrcode"></div>
-    </div>
+    <!-- تلميح تفاعلي يلمع للزبون -->
+    <div class="hint-click">🔄 إضغطي على الكرت لقلبه وإظهار كود الـ QR</div>
 
     <div class="info-text">
-        قم بإظهار كود الـ QR هذا للكاشير عند الدفع ليقوم بمسحه وشحن نقاطك فوراً ⚡
+        قومي بإظهار كود الـ QR المتواجد خلف بطاقتكِ الرقمية للكاشير عند الدفع ليقوم بمسحه وشحن نقاطكِ على الفور ⚡
     </div>
 
     <script>
@@ -148,15 +253,21 @@
         const currentPoints = urlParams.get('points') || '0';
         document.getElementById('points-val').innerText = currentPoints;
 
-        // توليد كود الـ QR الثابت الذي يحتوي على معرف الزبون (User ID)
+        // توليد الـ QR بدقة عالية داخل ظهر الكرت
         new QRCode(document.getElementById("qrcode"), {
             text: userId,
-            width: 160,
-            height: 160,
-            colorDark : "#1a1a1a",
+            width: 130,
+            height: 130,
+            colorDark : "#111111",
             colorLight : "#ffffff",
             correctLevel : QRCode.CorrectLevel.H
         });
+
+        // دالة القلب السلسة عند الضغط
+        function toggleCardFlip() {
+            const card = document.getElementById('loyaltyCard');
+            card.classList.toggle('flipped');
+        }
     </script>
 </body>
 </html>
