@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>لوحة تحكم الكاشير - CAMPUS YUMMY</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        :root {
+            --primary-gold: #e5a93b;
+            --dark-gold: #b88219;
+            --bg-color: #121212;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: radial-gradient(circle at center, #1e1e1e 0%, var(--bg-color) 100%);
+            margin: 0;
+            padding: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+            color: white;
+        }
+
+        .admin-box {
+            width: 100%;
+            max-width: 360px;
+            background: rgba(40, 40, 40, 0.75);
+            border-radius: 20px;
+            padding: 20px;
+            box-sizing: border-box;
+            border: 1px solid rgba(229, 169, 59, 0.3);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.5);
+            text-align: center;
+        }
+
+        h2 {
+            color: var(--primary-gold);
+            margin-top: 0;
+            font-size: 20px;
+        }
+
+        .btn-scan {
+            width: 100%;
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            color: white;
+            border: none;
+            padding: 15px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.3);
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* 🧮 تصميم الآلة الحاسبة للكاشير */
+        .calculator {
+            background: #1a1a1a;
+            border-radius: 15px;
+            padding: 15px;
+            border: 1px solid #333;
+        }
+
+        .calc-screen {
+            width: 100%;
+            height: 50px;
+            background: #2d2d2d;
+            border: 1px solid var(--primary-gold);
+            border-radius: 10px;
+            color: white;
+            font-size: 22px;
+            text-align: left;
+            padding: 10px;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+        }
+
+        .calc-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .calc-btn {
+            background: #333;
+            color: white;
+            border: none;
+            padding: 15px 5px;
+            font-size: 18px;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.1s;
+        }
+
+        .calc-btn:active { background: #555; }
+        .calc-btn.operator { background: var(--dark-gold); color: white; }
+        .calc-btn.clear { background: #c0392b; }
+        .calc-btn.confirm { 
+            grid-column: span 4; 
+            background: linear-gradient(135deg, var(--primary-gold) 0%, var(--dark-gold) 100%); 
+            margin-top: 5px;
+        }
+
+        .status-msg {
+            font-size: 12px;
+            color: #aaa;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="admin-box">
+        <h2>🏪 لوحة كاشير CAMPUS YUMMY</h2>
+        
+        <!-- 📸 زر السكان في الأعلى -->
+        <button class="btn-scan" onclick="scanCustomerQR()">📸 الخطوة 1: مسح كود الزبون</button>
+
+        <!-- 🧮 الآلة الحاسبة لجمع السلع بداخل الـ WebApp -->
+        <div class="calculator">
+            <div style="font-size: 13px; color: #999; margin-bottom: 5px; text-align: right;">الخطوة 2: حساب الفاتورة (دج)</div>
+            <input type="text" class="calc-screen" id="display" readonly value="0">
+            
+            <div class="calc-grid">
+                <button class="calc-btn clear" onclick="clearCalc()">C</button>
+                <button class="calc-btn operator" onclick="appendOp('/')">÷</button>
+                <button class="calc-btn operator" onclick="appendOp('*')">×</button>
+                <button class="calc-btn operator" onclick="appendOp('-')">-</button>
+                
+                <button class="calc-btn" onclick="appendNum('7')">7</button>
+                <button class="calc-btn" onclick="appendNum('8')">8</button>
+                <button class="calc-btn" onclick="appendNum('9')">9</button>
+                <button class="calc-btn operator" onclick="appendOp('+')">+</button>
+                
+                <button class="calc-btn" onclick="appendNum('4')">4</button>
+                <button class="calc-btn" onclick="appendNum('5')">5</button>
+                <button class="calc-btn" onclick="appendNum('6')">6</button>
+                <button class="calc-btn operator" onclick="calculateResult()">=</button>
+                
+                <button class="calc-btn" onclick="appendNum('1')">1</button>
+                <button class="calc-btn" onclick="appendNum('2')">2</button>
+                <button class="calc-btn" onclick="appendNum('3')">3</button>
+                <button class="calc-btn" onclick="appendNum('0')">0</button>
+                
+                <button class="calc-btn confirm" onclick="sendDataToBot()">⚡ شحن النقاط للزبون فوراً</button>
+            </div>
+        </div>
+        
+        <div class="status-msg" id="status">يرجى عمل مسح لكود الزبون أولاً</div>
+    </div>
+
+    <script>
+        const tg = window.Telegram.WebApp;
+        tg.expand();
+        tg.ready();
+
+        let scannedUserId = "";
+        let display = document.getElementById('display');
+        let statusMsg = document.getElementById('status');
+
+        // 1. فتح الكاميرا لمسح كود الزبون
+        function scanCustomerQR() {
+            tg.showScanQrPopup({
+                text: "قم بمسح كود الـ QR المعروض في هاتف الزبون 📸"
+            }, function(scannedText) {
+                scannedUserId = scannedText.trim();
+                statusMsg.innerText = "✅ تم التعرف على الزبون رقم: " + scannedUserId;
+                statusMsg.style.color = "#2ecc71";
+                tg.closeScanQrPopup();
+                return true;
+            });
+        }
+
+        // 2. منطق عمل الآلة الحاسبة
+        function appendNum(num) {
+            if (display.value === '0') display.value = num;
+            else display.value += num;
+        }
+
+        function appendOp(op) {
+            display.value += op;
+        }
+
+        function clearCalc() {
+            display.value = '0';
+        }
+
+        function calculateResult() {
+            try {
+                display.value = eval(display.value);
+            } catch(e) {
+                display.value = 'Error';
+            }
+        }
+
+        // 3. إرسال البيانات النهائية للبوت (حساب الزبون + المجموع بالدينار)
+        function sendDataToBot() {
+            if (!scannedUserId) {
+                alert("⚠️ خطأ: يرجى مسح كود الزبون أولاً قبل الشحن!");
+                return;
+            }
+            calculateResult();
+            let finalAmount = parseInt(display.value);
+            if (isNaN(finalAmount) || finalAmount <= 0) {
+                alert("⚠️ خطأ: يرجى إدخال مبلغ صحيح بالفاتورة!");
+                return;
+            }
+
+            // نقوم بإرسال النص بصيغة "رقم_الزبون:المبلغ" إلى البوت
+            let payload = scannedUserId + ":" + finalAmount;
+            tg.sendData(payload);
+            tg.close();
+        }
+    </script>
+</body>
+</html>
