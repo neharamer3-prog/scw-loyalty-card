@@ -6,49 +6,220 @@
     <title>محفظة الأوفياء الرقمية</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        :root { --primary-gold: #e5a93b; --dark-gold: #b88219; --bg-color: #f8f9fa; }
-        body { font-family: sans-serif; background-color: var(--bg-color); margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; box-sizing: border-box; }
-        .loyalty-card { width: 100%; max-width: 360px; height: 210px; background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%); border-radius: 20px; padding: 25px; box-sizing: border-box; display: flex; flex-direction: column; justify-content: space-between; color: white; box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3); border: 1px solid rgba(229, 169, 59, 0.2); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; }
-        .logo-area { font-size: 18px; font-weight: 800; color: var(--primary-gold); }
-        .card-badge { font-size: 11px; background: linear-gradient(135deg, var(--primary-gold) 0%, var(--dark-gold) 100%); padding: 5px 12px; border-radius: 50px; font-weight: bold; }
-        .points-display { margin: 15px 0; }
-        .points-label { font-size: 11px; color: #adb5bd; }
-        .points-count { font-size: 42px; font-weight: 800; color: var(--primary-gold); }
-        .member-name { font-size: 15px; font-weight: 600; color: #f8f9fa; }
-        .scan-button-container { width: 100%; max-width: 360px; margin-top: 40px; }
-        .btn-scan { width: 100%; background: linear-gradient(135deg, var(--primary-gold) 0%, var(--dark-gold) 100%); color: white; border: none; padding: 18px; border-radius: 15px; font-size: 16px; font-weight: 700; cursor: pointer; box-shadow: 0 8px 20px rgba(229, 169, 59, 0.3); }
-        .info-text { font-size: 12px; color: #6c757d; text-align: center; margin-top: 15px; }
+        :root {
+            --primary-gold: #e5a93b;
+            --dark-gold: #b88219;
+            --bg-color: #f8f9fa;
+            --text-main: #212529;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        .loyalty-card {
+            width: 100%;
+            max-width: 360px;
+            height: 210px;
+            background: linear-gradient(135deg, #2d2d2d 0%, #1a1a1a 100%);
+            border-radius: 20px;
+            position: relative;
+            overflow: hidden;
+            padding: 25px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            color: white;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            border: 1px solid rgba(229, 169, 59, 0.2);
+            transition: transform 0.1s ease;
+        }
+
+        .loyalty-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -30%;
+            width: 250px;
+            height: 250px;
+            background: radial-gradient(circle, rgba(229, 169, 59, 0.2) 0%, transparent 70%);
+            border-radius: 50%;
+            pointer-events: none;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 2;
+        }
+
+        .logo-area {
+            font-size: 18px;
+            font-weight: 800;
+            color: var(--primary-gold);
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .card-badge {
+            font-size: 11px;
+            background: linear-gradient(135deg, var(--primary-gold) 0%, var(--dark-gold) 100%);
+            padding: 5px 12px;
+            border-radius: 50px;
+            font-weight: bold;
+            box-shadow: 0 2px 8px rgba(229, 169, 59, 0.3);
+        }
+
+        .points-display {
+            z-index: 2;
+            margin: 15px 0;
+        }
+
+        .points-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #adb5bd;
+            margin-bottom: 2px;
+        }
+
+        .points-count {
+            font-size: 42px;
+            font-weight: 800;
+            background: linear-gradient(120deg, #ffffff 0%, #f8f9fa 50%, var(--primary-gold) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .card-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            z-index: 2;
+        }
+
+        .member-info .member-label {
+            font-size: 9px;
+            color: #6c757d;
+        }
+
+        .member-info .member-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: #f8f9fa;
+        }
+
+        .scan-button-container {
+            width: 100%;
+            max-width: 360px;
+            margin-top: 40px;
+        }
+
+        .btn-scan {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary-gold) 0%, var(--dark-gold) 100%);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(229, 169, 59, 0.3);
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-scan:active {
+            transform: scale(0.98);
+            box-shadow: 0 4px 10px rgba(229, 169, 59, 0.2);
+        }
+
+        .info-text {
+            font-size: 12px;
+            color: #6c757d;
+            text-align: center;
+            margin-top: 15px;
+            line-height: 1.5;
+            padding: 0 20px;
+        }
     </style>
 </head>
 <body>
-    <div class="loyalty-card">
+
+    <div class="loyalty-card" id="card">
         <div class="card-header">
-            <div class="logo-area">🍕 SCW PIZZERIA</div>
+            <!-- ✨ تم التعديل إلى الاسم الجديد هنا -->
+            <div class="logo-area">🍔 YUMMY 😋</div>
             <div class="card-badge">عضوية VIP</div>
         </div>
         <div class="points-display">
             <div class="points-label">رصيد النقاط الحالي</div>
             <div class="points-count" id="points-val">...</div>
         </div>
-        <div class="member-name" id="user-fullname">جاري التحميل..</div>
+        <div class="card-footer">
+            <div class="member-info">
+                <div class="member-label">حامل البطاقة</div>
+                <div class="member-name" id="user-fullname">جاري التحميل..</div>
+            </div>
+        </div>
     </div>
+
     <div class="scan-button-container">
         <button class="btn-scan" onclick="startQRScanner()">إرسال كود التحقق (Scan QR)</button>
     </div>
-    <div class="info-text">قم بمسح كود الـ QR المعروض عند الكاشير لتعبئة رصيد محفظتك فوراً.</div>
+
+    <div class="info-text">
+        قم بمسح كود الـ QR المعروض عند الكاشير لتعبئة رصيد محفظتك فوراً وتحديث نقاطك تلقائياً.
+    </div>
+
     <script>
         const tg = window.Telegram.WebApp;
-        tg.expand(); tg.ready();
+        tg.expand();
+        tg.ready();
+
         const telegramUser = tg.initDataUnsafe.user;
         if (telegramUser) {
-            document.getElementById('user-fullname').innerText = telegramUser.first_name + " " + (telegramUser.last_name || "");
+            const fullName = telegramUser.first_name + " " + (telegramUser.last_name || "");
+            document.getElementById('user-fullname').innerText = fullName;
         }
+
         const urlParams = new URLSearchParams(window.location.search);
-        document.getElementById('points-val').innerText = urlParams.get('points') || '0';
+        const currentPoints = urlParams.get('points') || '0';
+        document.getElementById('points-val').innerText = currentPoints;
+
+        const card = document.getElementById('card');
+        window.addEventListener('deviceorientation', (event) => {
+            if(event.beta && event.gamma) {
+                const tiltX = Math.min(Math.max(event.gamma, -15), 15) / 1.5;
+                const tiltY = Math.min(Math.max(event.beta - 45, -15), 15) / 1.5;
+                card.style.transform = `rotateY(${tiltX}deg) rotateX(${-tiltY}deg)`;
+            }
+        });
+
         function startQRScanner() {
-            tg.showScanQrPopup({ text: "قم بمسح كود الـ QR الخاص بالفاتورة لشحن نقاطك فوراً ⚡" }, function(scannedText) {
-                tg.sendData(scannedText); tg.closeScanQrPopup(); tg.close(); return true;
+            tg.showScanQrPopup({
+                text: "قم بمسح كود الـ QR الخاص بالفاتورة لشحن نقاطك فوراً ⚡"
+            }, function(scannedText) {
+                tg.sendData(scannedText);
+                tg.closeScanQrPopup();
+                tg.close();
+                return true;
             });
         }
     </script>
