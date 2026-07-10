@@ -5,12 +5,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>محفظة الأوفياء الرقمية</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
             --primary-gold: #e5a93b;
             --dark-gold: #b88219;
             --bg-color: #f8f9fa;
-            --text-main: #212529;
         }
 
         body {
@@ -41,36 +41,18 @@
             color: white;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
             border: 1px solid rgba(229, 169, 59, 0.2);
-            transition: transform 0.1s ease;
-        }
-
-        .loyalty-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -30%;
-            width: 250px;
-            height: 250px;
-            background: radial-gradient(circle, rgba(229, 169, 59, 0.2) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
         }
 
         .card-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            z-index: 2;
         }
 
         .logo-area {
             font-size: 18px;
             font-weight: 800;
             color: var(--primary-gold);
-            letter-spacing: 0.5px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
         }
 
         .card-badge {
@@ -79,79 +61,43 @@
             padding: 5px 12px;
             border-radius: 50px;
             font-weight: bold;
-            box-shadow: 0 2px 8px rgba(229, 169, 59, 0.3);
         }
 
         .points-display {
-            z-index: 2;
             margin: 15px 0;
         }
 
         .points-label {
             font-size: 11px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
             color: #adb5bd;
-            margin-bottom: 2px;
         }
 
         .points-count {
             font-size: 42px;
             font-weight: 800;
-            background: linear-gradient(120deg, #ffffff 0%, #f8f9fa 50%, var(--primary-gold) 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+            color: white;
         }
 
-        .card-footer {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            z-index: 2;
-        }
-
-        .member-info .member-label {
-            font-size: 9px;
-            color: #6c757d;
-        }
-
-        .member-info .member-name {
+        .member-name {
             font-size: 15px;
             font-weight: 600;
             color: #f8f9fa;
         }
 
-        .scan-button-container {
-            width: 100%;
-            max-width: 360px;
-            margin-top: 40px;
-        }
-
-        .btn-scan {
-            width: 100%;
-            background: linear-gradient(135deg, var(--primary-gold) 0%, var(--dark-gold) 100%);
-            color: white;
-            border: none;
-            padding: 18px;
+        /* 📌 قسم عرض كود الـ QR الخاص بالزبون */
+        .qr-container {
+            margin-top: 30px;
+            background: white;
+            padding: 15px;
             border-radius: 15px;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(229, 169, 59, 0.3);
-            transition: all 0.2s ease;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.05);
             display: flex;
             justify-content: center;
             align-items: center;
-            gap: 10px;
-        }
-
-        .btn-scan:active {
-            transform: scale(0.98);
-            box-shadow: 0 4px 10px rgba(229, 169, 59, 0.2);
         }
 
         .info-text {
-            font-size: 12px;
+            font-size: 13px;
             color: #6c757d;
             text-align: center;
             margin-top: 15px;
@@ -162,30 +108,26 @@
 </head>
 <body>
 
-    <div class="loyalty-card" id="card">
+    <div class="loyalty-card">
         <div class="card-header">
-            <!-- ✨ تم التعديل إلى الاسم الجديد هنا -->
-            <div class="logo-area">🍔 YUMMY 😋</div>
-            <div class="card-badge">عضوية VIP</div>
+            <div class="logo-area">🍔 CAMPUS YUMMY 😋</div>
+            <div class="card-badge">VIP CARD</div>
         </div>
         <div class="points-display">
             <div class="points-label">رصيد النقاط الحالي</div>
             <div class="points-count" id="points-val">...</div>
         </div>
         <div class="card-footer">
-            <div class="member-info">
-                <div class="member-label">حامل البطاقة</div>
-                <div class="member-name" id="user-fullname">جاري التحميل..</div>
-            </div>
+            <div class="member-name" id="user-fullname">جاري التحميل..</div>
         </div>
     </div>
 
-    <div class="scan-button-container">
-        <button class="btn-scan" onclick="startQRScanner()">إرسال كود التحقق (Scan QR)</button>
+    <div class="qr-container">
+        <div id="qrcode"></div>
     </div>
 
     <div class="info-text">
-        قم بمسح كود الـ QR المعروض عند الكاشير لتعبئة رصيد محفظتك فوراً وتحديث نقاطك تلقائياً.
+        قم بإظهار كود الـ QR هذا للكاشير عند الدفع ليقوم بمسحه وشحن نقاطك فوراً ⚡
     </div>
 
     <script>
@@ -194,7 +136,10 @@
         tg.ready();
 
         const telegramUser = tg.initDataUnsafe.user;
+        let userId = "unknown";
+        
         if (telegramUser) {
+            userId = telegramUser.id.toString();
             const fullName = telegramUser.first_name + " " + (telegramUser.last_name || "");
             document.getElementById('user-fullname').innerText = fullName;
         }
@@ -203,25 +148,15 @@
         const currentPoints = urlParams.get('points') || '0';
         document.getElementById('points-val').innerText = currentPoints;
 
-        const card = document.getElementById('card');
-        window.addEventListener('deviceorientation', (event) => {
-            if(event.beta && event.gamma) {
-                const tiltX = Math.min(Math.max(event.gamma, -15), 15) / 1.5;
-                const tiltY = Math.min(Math.max(event.beta - 45, -15), 15) / 1.5;
-                card.style.transform = `rotateY(${tiltX}deg) rotateX(${-tiltY}deg)`;
-            }
+        // توليد كود الـ QR الثابت الذي يحتوي على معرف الزبون (User ID)
+        new QRCode(document.getElementById("qrcode"), {
+            text: userId,
+            width: 160,
+            height: 160,
+            colorDark : "#1a1a1a",
+            colorLight : "#ffffff",
+            correctLevel : QRCode.CorrectLevel.H
         });
-
-        function startQRScanner() {
-            tg.showScanQrPopup({
-                text: "قم بمسح كود الـ QR الخاص بالفاتورة لشحن نقاطك فوراً ⚡"
-            }, function(scannedText) {
-                tg.sendData(scannedText);
-                tg.closeScanQrPopup();
-                tg.close();
-                return true;
-            });
-        }
     </script>
 </body>
 </html>
