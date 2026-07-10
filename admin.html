@@ -61,7 +61,6 @@
             gap: 10px;
         }
 
-        /* 🧮 تصميم الآلة الحاسبة للكاشير */
         .calculator {
             background: #1a1a1a;
             border-radius: 15px;
@@ -111,9 +110,12 @@
         }
 
         .status-msg {
-            font-size: 12px;
+            font-size: 13px;
             color: #aaa;
-            margin-top: 10px;
+            margin-top: 12px;
+            padding: 5px;
+            border-radius: 6px;
+            background: rgba(0,0,0,0.2);
         }
     </style>
 </head>
@@ -122,10 +124,8 @@
     <div class="admin-box">
         <h2>🏪 لوحة كاشير CAMPUS YUMMY</h2>
         
-        <!-- 📸 زر السكان في الأعلى -->
         <button class="btn-scan" onclick="scanCustomerQR()">📸 الخطوة 1: مسح كود الزبون</button>
 
-        <!-- 🧮 الآلة الحاسبة لجمع السلع بداخل الـ WebApp -->
         <div class="calculator">
             <div style="font-size: 13px; color: #999; margin-bottom: 5px; text-align: right;">الخطوة 2: حساب الفاتورة (دج)</div>
             <input type="text" class="calc-screen" id="display" readonly value="0">
@@ -155,7 +155,7 @@
             </div>
         </div>
         
-        <div class="status-msg" id="status">يرجى عمل مسح لكود الزبون أولاً</div>
+        <div class="status-msg" id="status">يرجى مسح كود الزبون للبدء</div>
     </div>
 
     <script>
@@ -167,20 +167,18 @@
         let display = document.getElementById('display');
         let statusMsg = document.getElementById('status');
 
-        // 1. فتح الكاميرا لمسح كود الزبون
         function scanCustomerQR() {
             tg.showScanQrPopup({
                 text: "قم بمسح كود الـ QR المعروض في هاتف الزبون 📸"
             }, function(scannedText) {
                 scannedUserId = scannedText.trim();
-                statusMsg.innerText = "✅ تم التعرف على الزبون رقم: " + scannedUserId;
+                statusMsg.innerText = "🎯 زبون جاهز للشحن: " + scannedUserId;
                 statusMsg.style.color = "#2ecc71";
                 tg.closeScanQrPopup();
                 return true;
             });
         }
 
-        // 2. منطق عمل الآلة الحاسبة
         function appendNum(num) {
             if (display.value === '0') display.value = num;
             else display.value += num;
@@ -196,29 +194,34 @@
 
         function calculateResult() {
             try {
-                display.value = eval(display.value);
+                // استخدام دالة آمنة لحساب المدخلات الاستعراضية
+                display.value = Function('"use strict";return (' + display.value + ')')();
             } catch(e) {
                 display.value = 'Error';
             }
         }
 
-        // 3. إرسال البيانات النهائية للبوت (حساب الزبون + المجموع بالدينار)
         function sendDataToBot() {
             if (!scannedUserId) {
-                alert("⚠️ خطأ: يرجى مسح كود الزبون أولاً قبل الشحن!");
+                alert("⚠️ خطأ: يرجى مسح كود الزبون أولاً!");
                 return;
             }
+            
             calculateResult();
             let finalAmount = parseInt(display.value);
+            
             if (isNaN(finalAmount) || finalAmount <= 0) {
-                alert("⚠️ خطأ: يرجى إدخال مبلغ صحيح بالفاتورة!");
+                alert("⚠️ خطأ: يرجى إدخال مبلغ صحيح!");
                 return;
             }
 
-            // نقوم بإرسال النص بصيغة "رقم_الزبون:المبلغ" إلى البوت
+            // تجهيز البيانات وإرسالها فوراً
             let payload = scannedUserId + ":" + finalAmount;
             tg.sendData(payload);
-            tg.close();
+            
+            // تحديث واجهة المستخدم بصرياً دون تفريغ المتغيرات فوراً لضمان وصولها للبوت
+            statusMsg.innerText = "⏳ جاري الإرسال والمعالجة...";
+            statusMsg.style.color = "#e5a93b";
         }
     </script>
 </body>
