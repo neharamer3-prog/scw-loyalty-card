@@ -45,7 +45,7 @@
 
         .btn-scan {
             width: 100%;
-            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+            background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
             color: white;
             border: none;
             padding: 15px;
@@ -53,7 +53,7 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
-            box-shadow: 0 6px 15px rgba(46, 204, 113, 0.3);
+            box-shadow: 0 6px 15px rgba(52, 152, 219, 0.3);
             margin-bottom: 20px;
             display: flex;
             justify-content: center;
@@ -103,10 +103,34 @@
         .calc-btn:active { background: #555; }
         .calc-btn.operator { background: var(--dark-gold); color: white; }
         .calc-btn.clear { background: #c0392b; }
-        .calc-btn.confirm { 
-            grid-column: span 4; 
-            background: linear-gradient(135deg, var(--primary-gold) 0%, var(--dark-gold) 100%); 
-            margin-top: 5px;
+        
+        /* أزرار العمليات التنفيذية السفلية */
+        .action-container {
+            grid-column: span 4;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .btn-execute {
+            width: 100%;
+            border: none;
+            padding: 14px;
+            font-size: 15px;
+            font-weight: bold;
+            border-radius: 10px;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
+        }
+
+        .btn-redeem {
+            background: linear-gradient(135deg, #c0392b 0%, #e74c3c 100%);
         }
 
         .status-msg {
@@ -127,7 +151,7 @@
         <button class="btn-scan" onclick="scanCustomerQR()">📸 الخطوة 1: مسح كود الزبون</button>
 
         <div class="calculator">
-            <div style="font-size: 13px; color: #999; margin-bottom: 5px; text-align: right;">الخطوة 2: حساب الفاتورة (دج)</div>
+            <div style="font-size: 13px; color: #999; margin-bottom: 5px; text-align: right;">الخطوة 2: اكتب المبلغ (دج) أو عدد نقاط التبديل</div>
             <input type="text" class="calc-screen" id="display" readonly value="0">
             
             <div class="calc-grid">
@@ -151,7 +175,11 @@
                 <button class="calc-btn" onclick="appendNum('3')">3</button>
                 <button class="calc-btn" onclick="appendNum('0')">0</button>
                 
-                <button class="calc-btn confirm" onclick="sendDataToBot()">⚡ شحن النقاط للزبون فوراً</button>
+                <!-- أزرار الإجراءات المتوافقة مع تحديثات البوت -->
+                <div class="action-container">
+                    <button class="btn-execute btn-add" onclick="sendDataToBot('ADD')">⚡ شحن نقاط جديدة (حساب من دج)</button>
+                    <button class="btn-execute btn-redeem" onclick="sendDataToBot('REDEEM')">🎁 تبديل وخصم نقاط من رصيده</button>
+                </div>
             </div>
         </div>
         
@@ -172,7 +200,7 @@
                 text: "قم بمسح كود الـ QR المعروض في هاتف الزبون 📸"
             }, function(scannedText) {
                 scannedUserId = scannedText.trim();
-                statusMsg.innerText = "🎯 زبون جاهز للشحن: " + scannedUserId;
+                statusMsg.innerText = "🎯 زبون جاهز للعملية: " + scannedUserId;
                 statusMsg.style.color = "#2ecc71";
                 tg.closeScanQrPopup();
                 return true;
@@ -200,24 +228,25 @@
             }
         }
 
-        function sendDataToBot() {
+        function sendDataToBot(actionType) {
             if (!scannedUserId) {
                 alert("⚠️ خطأ: يرجى مسح كود الزبون أولاً!");
                 return;
             }
             
             calculateResult();
-            let finalAmount = parseInt(display.value);
+            let finalValue = parseInt(display.value);
             
-            if (isNaN(finalAmount) || finalAmount <= 0) {
-                alert("⚠️ خطأ: يرجى إدخال مبلغ صحيح!");
+            if (isNaN(finalValue) || finalValue <= 0) {
+                alert("⚠️ خطأ: يرجى إدخال رقم صحيح على شاشة الحاسبة!");
                 return;
             }
 
-            let payload = scannedUserId + ":" + finalAmount;
+            // إرسال البيانات بالتركيبة المتوقعة للبوت: معرف_الزبون:القيمة:نوع_العملية
+            let payload = scannedUserId + ":" + finalValue + ":" + actionType;
             tg.sendData(payload);
             
-            statusMsg.innerText = "⏳ جاري الإرسال والمعالجة...";
+            statusMsg.innerText = "⏳ جاري تنفيذ وإرسال العملية (" + actionType + ")...";
             statusMsg.style.color = "#e5a93b";
         }
     </script>
