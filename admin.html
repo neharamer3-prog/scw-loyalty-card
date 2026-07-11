@@ -194,7 +194,6 @@
 
         function calculateResult() {
             try {
-                // استخدام دالة آمنة لحساب المدخلات الاستعراضية
                 display.value = Function('"use strict";return (' + display.value + ')')();
             } catch(e) {
                 display.value = 'Error';
@@ -215,11 +214,9 @@
                 return;
             }
 
-            // تجهيز البيانات وإرسالها فوراً
             let payload = scannedUserId + ":" + finalAmount;
             tg.sendData(payload);
             
-            // تحديث واجهة المستخدم بصرياً دون تفريغ المتغيرات فوراً لضمان وصولها للبوت
             statusMsg.innerText = "⏳ جاري الإرسال والمعالجة...";
             statusMsg.style.color = "#e5a93b";
         }
