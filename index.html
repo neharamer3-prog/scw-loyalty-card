@@ -3,240 +3,353 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>YUMMY 😋 - بطاقة الأوفياء</title>
+    <title>YUMMY 😋 - بطاقة الأوفياء الفاخرة</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
         :root {
-            --bg-color: #0d0d0d;
+            --bg-color: #080808;
             --gold: #f3c623;
             --gold-light: #fff3b0;
-            --brown-gradient: linear-gradient(180deg, #a65319 0%, #73340f 100%);
-            --card-bg: #141414;
+            --gold-glow: rgba(243, 198, 35, 0.5);
+            --brown-gradient: linear-gradient(135deg, #a65319 0%, #632b0b 100%);
+            --card-bg: rgba(20, 20, 20, 0.85);
             --text-color: #ffffff;
         }
 
         body {
             background-color: var(--bg-color);
-            /* تأثير الخلفية المتموجة الداكنة والمضيئة من الأعلى */
+            /* خلفية ملكية متموجة مع إضاءة دائرية بالمنتصف */
             background-image: 
-                radial-gradient(circle at top, #261c04 0%, #0d0d0d 60%),
-                linear-gradient(0deg, rgba(0,0,0,0.5) 0%, rgba(0,0,0,0.5) 100%);
+                radial-gradient(circle at top, #201703 0%, #080808 70%);
             color: var(--text-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             margin: 0;
-            padding: 15px;
+            padding: 20px 15px;
             display: flex;
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
             box-sizing: border-box;
-        }
-
-        /* 1️⃣ الهيدر الفخم (الجزء العلوي) */
-        .card-header { 
-            text-align: center; 
-            margin-top: 20px;
-            margin-bottom: 20px; 
-            width: 100%;
-        }
-        
-        /* دائرة الإيموجي الذهبية المضيئة */
-        .logo-container {
-            width: 110px;
-            height: 110px;
-            margin: 0 auto 15px auto;
-            border-radius: 50%;
-            background: transparent;
-            border: 3px solid var(--gold);
-            box-shadow: 0 0 20px rgba(243, 198, 35, 0.6), inset 0 0 15px rgba(243, 198, 35, 0.4);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            overflow-x: hidden;
             position: relative;
         }
-        .brand-logo { 
-            font-size: 60px; 
-            line-height: 1;
-        }
-        
-        h1 { 
-            color: #ffffff; 
-            margin: 0; 
-            font-size: 2.2em;
-            font-weight: 800;
-            letter-spacing: 2px; 
-            text-shadow: 0 2px 4px rgba(0,0,0,0.8);
-        }
-        .brand-subtitle { 
-            color: #d4af37; 
-            margin: 3px 0; 
-            font-size: 1.1em; 
-            font-weight: 600;
-        }
-        .brand-sub-campus {
-            color: #b3b3b3;
-            margin: 0;
-            font-size: 0.9em;
+
+        /* ✨ تأثير جزيئات البريق الذهبي المتلألئ في الخلفية */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                radial-gradient(circle, var(--gold-light) 1px, transparent 1px),
+                radial-gradient(circle, var(--gold) 1.5px, transparent 1.5px);
+            background-size: 40px 40px, 60px 60px;
+            background-position: 0 0, 20px 30px;
+            opacity: 0.15;
+            animation: glitter 8s linear infinite;
+            z-index: 0;
+            pointer-events: none;
         }
 
-        /* 2️⃣ منطقة بطاقة النقاط العائمة مدمجة مع الـ QR في الخلفية */
-        .card-container-wrapper {
+        @keyframes glitter {
+            0% { transform: translateY(0); }
+            100% { transform: translateY(-60px); }
+        }
+
+        /* الحاوية الرئيسية لضمان ظهور العناصر فوق البريق */
+        .main-content {
             position: relative;
+            z-index: 1;
             width: 100%;
-            max-width: 360px;
-            margin-bottom: 30px;
             display: flex;
             flex-direction: column;
             align-items: center;
         }
 
-        /* حاوية كود الـ QR خلف مربع النقاط */
-        .qr-background {
-            background: white;
-            padding: 8px;
-            border-radius: 12px;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
-            margin-bottom: -15px; /* تجعله يختبئ جزئياً خلف المربع البني */
-            z-index: 1;
-            transform: scale(0.85);
-            opacity: 0.8;
-            transition: all 0.3s ease;
+        /* 1️⃣ الهيدر الفخم المضيء */
+        .card-header { 
+            text-align: center; 
+            margin-top: 10px;
+            margin-bottom: 25px; 
+            width: 100%;
         }
         
-        /* بطاقة النقاط العائمة (نفس لون وحجم الصورة بالضبط) */
+        /* دائرة الإيموجي مع نبض بريق ذهبي خارق */
+        .logo-container {
+            width: 115px;
+            height: 115px;
+            margin: 0 auto 15px auto;
+            border-radius: 50%;
+            background: radial-gradient(circle, #2a1f06 0%, #111 100%);
+            border: 3px solid var(--gold);
+            box-shadow: 0 0 25px var(--gold-glow), inset 0 0 20px rgba(243, 198, 35, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            animation: pulseGlow 3s infinite alternate;
+        }
+
+        @keyframes pulseGlow {
+            0% { box-shadow: 0 0 20px rgba(243, 198, 35, 0.4), inset 0 0 15px rgba(243, 198, 35, 0.2); }
+            100% { box-shadow: 0 0 35px rgba(243, 198, 35, 0.7), inset 0 0 25px rgba(243, 198, 35, 0.4); }
+        }
+
+        .brand-logo { 
+            font-size: 65px; 
+            line-height: 1;
+            filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+        }
+        
+        h1 { 
+            color: #ffffff; 
+            margin: 0; 
+            font-size: 2.4em;
+            font-weight: 900;
+            letter-spacing: 3px; 
+            background: linear-gradient(135deg, #ffffff 30%, #f3c623 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-shadow: 0 3px 6px rgba(0,0,0,0.5);
+        }
+        .brand-subtitle { 
+            color: var(--gold); 
+            margin: 5px 0 2px 0; 
+            font-size: 1.2em; 
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-shadow: 0 1px 3px rgba(0,0,0,0.6);
+        }
+        .brand-sub-campus {
+            color: #b3b3b3;
+            margin: 0;
+            font-size: 0.95em;
+            font-weight: 500;
+        }
+
+        /* 2️⃣ منطقة بطاقة النقاط التفاعلية مع الـ QR المخفي */
+        .card-container-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 360px;
+            margin-top: 40px; /* ترك مساحة كافية لانبثاق الـ QR للأعلى */
+            margin-bottom: 35px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* حاوية كود الـ QR - مخفية تماماً وراء مستطيل النقاط افتراضياً */
+        .qr-background {
+            background: white;
+            padding: 12px;
+            border-radius: 16px;
+            box-shadow: 0 0 30px rgba(243, 198, 35, 0.3);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.4);
+            z-index: 1; /* خلف البطاقة */
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        
+        /* مستطيل النقاط الفاخر البني */
         .points-card {
             background: var(--brown-gradient);
             width: 100%;
-            padding: 20px 15px;
-            border-radius: 18px;
+            padding: 24px 20px;
+            border-radius: 22px;
             text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.6);
-            border: 1px solid rgba(255, 255, 255, 0.15);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.7), inset 0 1px 1px rgba(255,255,255,0.2);
+            border: 1px solid rgba(255, 255, 255, 0.18);
             box-sizing: border-box;
-            z-index: 2; /* لتكون فوق الـ QR */
+            z-index: 2; /* يغطي على الـ QR */
             position: relative;
+            transition: all 0.4s ease;
+        }
+
+        .points-card::after {
+            content: "اضغط لعرض كود الـ QR 📱";
+            display: block;
+            font-size: 0.7em;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 10px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+            transition: opacity 0.3s;
         }
         
         .points-value { 
-            font-size: 2.5em; 
-            font-weight: bold; 
+            font-size: 2.7em; 
+            font-weight: 800; 
             color: #ffffff; 
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 8px;
+            gap: 10px;
             margin: 0;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.4);
         }
-        .points-value span { font-size: 0.75em; font-weight: normal; }
-        .points-value .medal { font-size: 0.9em; }
+        .points-value span { font-size: 0.7em; font-weight: 600; color: var(--gold-light); }
+        .points-value .medal { filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
         
-        /* شريط التقدم الفاخر */
+        /* شريط التقدم اللامع */
         .progress-container { 
-            background: rgba(0, 0, 0, 0.3); 
-            height: 16px; 
+            background: rgba(0, 0, 0, 0.4); 
+            height: 18px; 
             border-radius: 20px; 
-            margin: 15px 0 10px 0; 
+            margin: 18px 0 10px 0; 
             overflow: hidden; 
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             position: relative;
+            box-shadow: inset 0 2px 5px rgba(0,0,0,0.5);
         }
         .progress-bar { 
-            background: linear-gradient(90deg, #e6b800, var(--gold)); 
+            background: linear-gradient(90deg, #d4af37, #f3c623, #fff3b0); 
+            background-size: 200% 100%;
+            animation: shineGlow 2s linear infinite;
             height: 100%; 
             width: 0%; 
             border-radius: 20px; 
-            transition: width 1s ease-in-out;
-            box-shadow: inset 0 2px 4px rgba(255,255,255,0.2);
+            transition: width 1.2s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(243, 198, 35, 0.5);
+        }
+        @keyframes shineGlow {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
         }
         .progress-percentage {
             position: absolute;
             right: 15px;
             top: 50%;
             transform: translateY(-50%);
-            font-size: 0.75em;
-            color: #ffffff;
-            font-weight: bold;
+            font-size: 0.8em;
+            color: #000;
+            font-weight: 900;
         }
         .status-text { 
-            color: #fff3b0; 
-            font-size: 0.9em; 
-            margin: 5px 0 0 0; 
-            font-weight: 500;
+            color: var(--gold-light); 
+            font-size: 0.95em; 
+            margin: 8px 0 0 0; 
+            font-weight: 600;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
         }
 
-        /* 3️⃣ شبكة استعراض المأكولات والمكافآت */
+        /* ✨ وضعية تفعيل ظهور الـ QR عند الضغط وبث الحركات السحرية */
+        .card-container-wrapper.show-qr .qr-background {
+            opacity: 1;
+            transform: translate(-50%, -152%) scale(1); /* صعود انسيابي مذهل للأعلى */
+            pointer-events: auto;
+        }
+        .card-container-wrapper.show-qr .points-card {
+            transform: translateY(15px);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+        }
+        .card-container-wrapper.show-qr .points-card::after {
+            content: "انقر مجدداً لإخفاء الكود ✖️";
+            color: var(--gold-light);
+        }
+
+        /* 3️⃣ شبكة المكافآت الأنيقة ذات الحواف المضيئة بالذهب */
         .rewards-section {
             width: 100%;
             max-width: 360px;
+            margin-top: 10px;
         }
         .rewards-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 12px;
+            gap: 15px;
         }
         .reward-item {
             background: var(--card-bg);
-            border-radius: 14px;
-            padding: 8px;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border-radius: 18px;
+            padding: 10px;
             text-align: center;
-            border: 1px solid #222;
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            box-shadow: 0 6px 15px rgba(0,0,0,0.4);
+            transition: transform 0.3s ease, border-color 0.3s ease;
+        }
+        .reward-item:hover {
+            border-color: rgba(243, 198, 35, 0.3);
+            transform: translateY(-3px);
         }
         .reward-img {
             width: 100%;
-            height: 95px;
+            height: 105px;
             object-fit: cover;
-            border-radius: 10px;
+            border-radius: 14px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         }
-        .reward-name { font-size: 0.9em; font-weight: bold; margin: 4px 0 2px 0; color: #fff; }
+        .reward-name { 
+            font-size: 0.95em; 
+            font-weight: 700; 
+            margin: 8px 0 4px 0; 
+            color: #ffffff; 
+        }
         .reward-cost { 
             font-size: 0.85em; 
-            color: #ffffff; 
-            background: rgba(243, 198, 35, 0.15);
-            border: 1px solid rgba(243, 198, 35, 0.3);
+            color: var(--gold-light); 
+            font-weight: 700;
+            background: linear-gradient(135deg, rgba(166,83,25,0.3) 0%, rgba(243,198,35,0.15) 100%);
+            border: 1px solid rgba(243, 198, 35, 0.25);
             border-radius: 20px;
-            padding: 2px 8px;
+            padding: 3px 12px;
             display: inline-block;
-            margin-top: 2px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
         }
     </style>
 </head>
 <body>
 
-    <div class="card-header">
-        <div class="logo-container">
-            <div class="brand-logo">😋</div>
+    <div class="main-content">
+        <!-- 1️⃣ الجزء العلوي الفاخر -->
+        <div class="card-header">
+            <div class="logo-container">
+                <div class="brand-logo">😋</div>
+            </div>
+            <h1>YUMMY</h1>
+            <p class="brand-subtitle">بطاقة الأوفياء الرقمية</p>
+            <p class="brand-sub-campus">لمحل CAMPUS</p>
         </div>
-        <h1>YUMMY</h1>
-        <p class="brand-subtitle">بطاقة الأوفياء الرقمية</p>
-        <p class="brand-sub-campus">لمحل CAMPUS</p>
-    </div>
 
-    <div class="card-container-wrapper">
-        
-        <div class="qr-background">
-            <div id="qrcode"></div>
-        </div>
-        
-        <div class="points-card">
-            <div class="points-value" id="points-display">
-                <span id="points-num">450</span> <span>نقطة</span> <span class="medal">🏅</span>
+        <!-- 2️⃣ منطقة النقاط التفاعلية والـ QR السحري المخفي بالخلفية -->
+        <div class="card-container-wrapper">
+            
+            <!-- حاوية الـ QR الذهبية الخلفية تنبثق للأعلى بشكل رائع عند النقر -->
+            <div class="qr-background">
+                <div id="qrcode"></div>
             </div>
-            <div class="progress-container">
-                <div class="progress-bar" id="progress-bar"></div>
-                <div class="progress-percentage" id="progress-percent">0%</div>
+            
+            <!-- مستطيل رصيد النقاط الفخم -->
+            <div class="points-card">
+                <div class="points-value">
+                    <span id="points-num">0</span> <span>نقطة</span> <span class="medal">🏅</span>
+                </div>
+                <div class="progress-container">
+                    <div class="progress-bar" id="progress-bar"></div>
+                    <div class="progress-percentage" id="progress-percent">0%</div>
+                </div>
+                <p class="status-text" id="status-text">جاري مزامنة رصيدك فخم...</p>
             </div>
-            <p class="status-text" id="status-text">جاري الحساب...</p>
         </div>
-    </div>
 
-    <div class="rewards-section">
-        <div class="rewards-grid" id="rewards-grid-container">
+        <!-- 3️⃣ شبكة الهدايا والمكافآت الفاخرة -->
+        <div class="rewards-section">
+            <div class="rewards-grid" id="rewards-grid-container">
+                <!-- يتم بناؤها برمجياً من الأسفل -->
             </div>
+        </div>
     </div>
 
     <script>
-        // إعدادات التحكم بالأسعار القادمة ديناميكياً من البوت
+        // إعدادات مصادقة وتمدد واجهة تلغرام
         const tg = window.Telegram.WebApp;
         tg.expand();
 
@@ -244,7 +357,7 @@
         const userId = urlParams.get('user_id') || "123456789"; 
         const points = parseInt(urlParams.get('points')) || 0;
 
-        // استقبال الأسعار الحية القادمة من البوت
+        // جلب الأسعار الديناميكية والآمنة الواردة من السيرفر
         const burgerCost = parseInt(urlParams.get('b_cost')) || 500;
         const pizzaCost  = parseInt(urlParams.get('p_cost')) || 700;
         const friesCost  = parseInt(urlParams.get('f_cost')) || 200;
@@ -257,28 +370,28 @@
             soda:   { name: "مشروب غازي", cost: sodaCost, img: "https://images.unsplash.com/photo-1513558161293-cdaf765ed2fd?w=400" }
         };
 
-        // تحديث قيمة النقاط في المربع البني
+        // عرض النقاط الحية داخل المستطيل البني
         document.getElementById('points-num').innerText = points;
         
-        // حساب نسبة شريط التقدم بناءً على سعر البرجر الحالي
+        // حساب مستوى التقدم نسبة للبرجر كهدف أول للزبون
         const targetPoints = REWARDS_CONFIG.burger.cost; 
         const progressPercentage = Math.min(Math.round((points / targetPoints) * 100), 100);
         
         setTimeout(() => {
             document.getElementById('progress-bar').style.width = `${progressPercentage}%`;
             document.getElementById('progress-percent').innerText = `${progressPercentage}%`;
-        }, 300);
+        }, 400);
 
-        // العبارة التفاعلية أسفل الشريط
+        // تخصيص عبارات التحفيز بناء على الرصيد
         const statusTextElement = document.getElementById('status-text');
         if (points >= targetPoints) {
-            statusTextElement.innerText = "🎉 لديك نقاط كافية لطلب برجر مجاني الآن!";
+            statusTextElement.innerText = "🎉 مبروك! نقاطك كافية لطلب برجر مجاني الآن!";
         } else {
             const remaining = targetPoints - points;
             statusTextElement.innerText = `باقي ${remaining} نقطة للحصول على برجر مجاني!`;
         }
 
-        // توليد شبكة الأكلات ديناميكياً
+        // بناء المعروضات بشكل ديناميكي ساحر
         const gridContainer = document.getElementById('rewards-grid-container');
         gridContainer.innerHTML = ""; 
         Object.values(REWARDS_CONFIG).forEach(item => {
@@ -291,9 +404,15 @@
             `;
         });
 
-        // توليد كود الـ QR المتموضع بالخلفية
+        // تشفير كود الـ QR وتوليده في خلفية الحاوية
         new QRCode(document.getElementById("qrcode"), {
-            text: userId, width: 110, height: 110, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M
+            text: userId, width: 120, height: 120, colorDark : "#000000", colorLight : "#ffffff", correctLevel : QRCode.CorrectLevel.M
+        });
+
+        // ✨ السحر التفاعلي: التحكم في انبثاق وإخفاء كود الـ QR بنقرة على مستطيل النقاط
+        const wrapper = document.querySelector('.card-container-wrapper');
+        wrapper.addEventListener('click', () => {
+            wrapper.classList.toggle('show-qr');
         });
     </script>
 </body>
